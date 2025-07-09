@@ -1,1 +1,21 @@
+
 services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: user          # Must match your application.yaml
+      POSTGRES_PASSWORD: password  # Must match your application.yaml
+      POSTGRES_DB: ecommerce_db    # Must match your DB name
+    ports:
+      - "5433:5432"  # Host:Container port mapping
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d ecommerce_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
