@@ -25,7 +25,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            chain.doFilter(request, response); // 🚀 Just skip if no token
+            return;
+        }
+
+        try {
             String token = authHeader.substring(7);
             String email = jwtUtil.extractUsername(token);
 
@@ -38,8 +43,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
+        } catch (Exception e) {
+            // 🛡️ Log and skip instead of blocking access
+            System.out.println("JWT validation failed: " + e.getMessage());
         }
 
         chain.doFilter(request, response);
     }
+
 }
