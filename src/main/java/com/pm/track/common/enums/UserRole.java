@@ -1,4 +1,4 @@
-package com.pm.track.enums;
+package com.pm.track.common.enums;
 
 public enum UserRole {
     USER,

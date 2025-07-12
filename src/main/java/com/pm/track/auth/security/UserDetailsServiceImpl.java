@@ -1,7 +1,7 @@
-package com.pm.track.security;
+package com.pm.track.auth.security;
 
-import com.pm.track.entity.User;
-import com.pm.track.repository.UserRepository;
+import com.pm.track.user.entity.User;
+import com.pm.track.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
@@ -24,10 +24,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
         );
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                authorities
-        );
+        return new UserDetailsImpl(user);
     }
 }

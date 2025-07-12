@@ -1,7 +1,7 @@
-package com.pm.track.dto;
+package com.pm.track.user.dto;
 
 
-import com.pm.track.enums.UserRole;
+import com.pm.track.common.enums.UserRole;
 import lombok.*;
 
 @Getter

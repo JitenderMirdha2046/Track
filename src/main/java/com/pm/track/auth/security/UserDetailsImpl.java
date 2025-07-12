@@ -1,7 +1,7 @@
-package com.pm.track.security;
+package com.pm.track.auth.security;
 
-import com.pm.track.entity.User;
-import com.pm.track.enums.UserRole;
+import com.pm.track.user.entity.User;
+import com.pm.track.common.enums.UserRole;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

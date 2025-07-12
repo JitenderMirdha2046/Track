@@ -1,16 +1,18 @@
-package com.pm.track.service.impl;
+package com.pm.track.user.service.impl;
 
-import com.pm.track.dto.LoginRequest;
-import com.pm.track.dto.SignupRequest;
-import com.pm.track.dto.UserRequest;
-import com.pm.track.dto.UserResponse;
-import com.pm.track.entity.User;
-import com.pm.track.enums.UserRole;
+import com.pm.track.auth.dto.SignupRequest;
+import com.pm.track.user.dto.ChangePasswordRequest;
+import com.pm.track.auth.dto.LoginRequest;
+import com.pm.track.user.entity.User;
+import com.pm.track.common.enums.UserRole;
 import com.pm.track.exception.CustomException;
-import com.pm.track.repository.UserRepository;
-import com.pm.track.security.JwtUtil;
-import com.pm.track.security.UserDetailsImpl;
-import com.pm.track.service.UserService;
+import com.pm.track.user.repository.UserRepository;
+import com.pm.track.auth.security.JwtUtil;
+import com.pm.track.auth.security.UserDetailsImpl;
+import com.pm.track.common.EmailService;
+import com.pm.track.user.service.UserService;
+import com.pm.track.user.dto.UserRequest;
+import com.pm.track.user.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -47,6 +50,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         userRepository.save(user);
+        emailService.sendWelcomeEmail(user.getEmail(), user.getName());
 
         return UserResponse.builder()
                 .id(user.getId())
@@ -63,6 +67,7 @@ public class UserServiceImpl implements UserService {
         );
 
         UserDetails userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        emailService.sendReturningUserOfferEmail(userDetails.getUsername(), userDetails.getPassword());
         return jwtUtil.generateToken(userDetails.getUsername());
     }
 
@@ -111,6 +116,28 @@ public class UserServiceImpl implements UserService {
         return users.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public void changePassword(ChangePasswordRequest request) {
+        String email = getCurrentEmail();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException("User not found", HttpStatus.NOT_FOUND));
+
+        // Check if old password matches
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new CustomException("Old password is incorrect", HttpStatus.BAD_REQUEST);
+        }
+
+        // Check if new password is same as old
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new CustomException("New password cannot be same as old password", HttpStatus.BAD_REQUEST);
+        }
+
+        // Set and save new password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 
 

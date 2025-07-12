@@ -1,4 +1,4 @@
-package com.pm.track.security;
+package com.pm.track.auth.security;
 
 
 import io.jsonwebtoken.*;

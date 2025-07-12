@@ -1,6 +1,7 @@
-package com.pm.track.dto;
+package com.pm.track.auth.dto;
 
 
+import com.pm.track.common.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -10,7 +11,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginRequest {
+public class SignupRequest {
+
+    @NotBlank
+    private String name;
 
     @Email
     @NotBlank
@@ -18,4 +22,6 @@ public class LoginRequest {
 
     @NotBlank
     private String password;
+
+    private UserRole role = UserRole.USER;
 }

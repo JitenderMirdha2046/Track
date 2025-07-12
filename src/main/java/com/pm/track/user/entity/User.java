@@ -1,7 +1,7 @@
-package com.pm.track.entity;
+package com.pm.track.user.entity;
 
 
-import com.pm.track.enums.UserRole;
+import com.pm.track.common.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
